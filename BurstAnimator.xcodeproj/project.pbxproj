@@ -8,20 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		743D39871CC7B36600B5756F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743D39861CC7B36600B5756F /* AppDelegate.swift */; };
-		743D39891CC7B36600B5756F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743D39881CC7B36600B5756F /* ViewController.swift */; };
 		743D398C1CC7B36600B5756F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 743D398A1CC7B36600B5756F /* Main.storyboard */; };
 		743D398E1CC7B36600B5756F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 743D398D1CC7B36600B5756F /* Assets.xcassets */; };
 		743D39911CC7B36600B5756F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 743D398F1CC7B36600B5756F /* LaunchScreen.storyboard */; };
+		74FE5E6F1CCBD3B100D6BD76 /* BurstAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FE5E6E1CCBD3B100D6BD76 /* BurstAlbumVC.swift */; };
+		74FE5E771CCBDB7100D6BD76 /* BurstAlbumCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FE5E761CCBDB7100D6BD76 /* BurstAlbumCVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		743D39831CC7B36600B5756F /* BurstAnimator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BurstAnimator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		743D39861CC7B36600B5756F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		743D39881CC7B36600B5756F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		743D398B1CC7B36600B5756F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		743D398D1CC7B36600B5756F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		743D39901CC7B36600B5756F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		743D39921CC7B36600B5756F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		74FE5E6E1CCBD3B100D6BD76 /* BurstAlbumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurstAlbumVC.swift; sourceTree = "<group>"; };
+		74FE5E761CCBDB7100D6BD76 /* BurstAlbumCVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurstAlbumCVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,14 +56,31 @@
 		743D39851CC7B36600B5756F /* BurstAnimator */ = {
 			isa = PBXGroup;
 			children = (
+				74FE5E6D1CCBD36F00D6BD76 /* Controller */,
+				74FE5E6C1CCBD36600D6BD76 /* View */,
 				743D39861CC7B36600B5756F /* AppDelegate.swift */,
-				743D39881CC7B36600B5756F /* ViewController.swift */,
 				743D398A1CC7B36600B5756F /* Main.storyboard */,
 				743D398D1CC7B36600B5756F /* Assets.xcassets */,
 				743D398F1CC7B36600B5756F /* LaunchScreen.storyboard */,
 				743D39921CC7B36600B5756F /* Info.plist */,
 			);
 			path = BurstAnimator;
+			sourceTree = "<group>";
+		};
+		74FE5E6C1CCBD36600D6BD76 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				74FE5E761CCBDB7100D6BD76 /* BurstAlbumCVC.swift */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		74FE5E6D1CCBD36F00D6BD76 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				74FE5E6E1CCBD3B100D6BD76 /* BurstAlbumVC.swift */,
+			);
+			name = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,8 +154,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				743D39891CC7B36600B5756F /* ViewController.swift in Sources */,
 				743D39871CC7B36600B5756F /* AppDelegate.swift in Sources */,
+				74FE5E6F1CCBD3B100D6BD76 /* BurstAlbumVC.swift in Sources */,
+				74FE5E771CCBDB7100D6BD76 /* BurstAlbumCVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +308,7 @@
 				743D39971CC7B36600B5756F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
