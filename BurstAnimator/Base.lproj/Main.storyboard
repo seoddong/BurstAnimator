@@ -19,6 +19,7 @@
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="eyL-mW-MBA">
                                 <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Pa4-mL-bib">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -33,12 +34,19 @@
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="02I-et-Ac3">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="02I-et-Ac3">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </imageView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="02I-et-Ac3" secondAttribute="trailing" id="EBD-5I-vQs"/>
+                                            <constraint firstItem="02I-et-Ac3" firstAttribute="leading" secondItem="RMI-fS-chT" secondAttribute="leading" id="HN0-Ry-6ZT"/>
+                                            <constraint firstAttribute="bottom" secondItem="02I-et-Ac3" secondAttribute="bottom" id="Him-aI-3Pq"/>
+                                            <constraint firstItem="02I-et-Ac3" firstAttribute="top" secondItem="RMI-fS-chT" secondAttribute="top" id="eCf-Tn-Aa8"/>
+                                        </constraints>
                                         <connections>
                                             <outlet property="imgView" destination="02I-et-Ac3" id="Cg7-o7-hD4"/>
                                         </connections>

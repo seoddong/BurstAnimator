@@ -26,6 +26,10 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        // UX 설정
+        // 1. Collection View
+        burstAlbumCollectionView.backgroundColor = UIColor.whiteColor()
+        // Collection View 설정
         burstAlbumCollectionView.delegate = self
         burstAlbumCollectionView.dataSource = self
         
@@ -34,6 +38,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         scale = UIScreen.mainScreen().scale
         // 화면의 좁은 쪽을 기준으로 3등분한다.
         targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / 3
+        print("targetSizeX = \(targetSizeX)")
         
         options.includeAllBurstAssets = true
         
@@ -64,6 +69,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         if let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as? BurstAlbumCVC {
             
             cell.imageManager = imageManager
+            print("Cell 내용 설정 - targetSizeX = \(targetSizeX)")
             cell.targetSizeX = targetSizeX
             cell.imageAsset = burstImages[indexPath.item] as? PHAsset
             
@@ -97,10 +103,21 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         
-
-        print("targetSizeX = \(targetSizeX)")
-        // 이 샘플에서는 Cell의 크기를 105x105로 지정한다.
+        // Cell spacing과 padding값에 의해서 셀 크기가 계산되어졌다 하더라도 제대로 안 들어가는 경우가 있다.
+        // Cell spacing은 10정도 유지하는 것이 좋고 padding은 없는 것이 사진앱과 비슷한 UX를 제공한다.
+        // 그러므로 최종 Cell의 크기는 CollectionView의 Min Spacing For Cell 값을 참조하여 빼주도록 한다.
+        targetSizeX = burstAlbumCollectionView.frame.width / 3 - 1 // Min Spacing For Cell
+        print("Cell 크기 설정 - targetSizeX = \(targetSizeX)")
+        
         return CGSizeMake(targetSizeX, targetSizeX)
+    }
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+        return 0 as CGFloat
+    }
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+        return 1 as CGFloat
     }
     
     
