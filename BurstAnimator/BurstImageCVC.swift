@@ -17,7 +17,7 @@
 import UIKit
 import Photos
 
-class BurstAlbumCVC: UICollectionViewCell {
+class BurstImageCVC: UICollectionViewCell {
     
     @IBOutlet weak var imgView: UIImageView!
     

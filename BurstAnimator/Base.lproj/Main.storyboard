@@ -65,11 +65,73 @@
                     <navigationItem key="navigationItem" title="Burst Album" id="JQD-oo-cLf"/>
                     <connections>
                         <outlet property="burstAlbumCollectionView" destination="eyL-mW-MBA" id="7TV-i2-yGv"/>
+                        <segue destination="OLN-C9-fBb" kind="show" identifier="BurstImageSegue" id="8C4-5S-2B9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1172" y="399"/>
+        </scene>
+        <!--Burst Images-->
+        <scene sceneID="PGu-IC-vd5">
+            <objects>
+                <viewController id="OLN-C9-fBb" customClass="BurstImageVC" customModule="BurstAnimator" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="nLH-ke-py0"/>
+                        <viewControllerLayoutGuide type="bottom" id="bzf-5D-z7Z"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="FC7-5J-7Mp">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Fi3-Uu-s88">
+                                <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ixh-wv-Ufm">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell2" id="mOn-xS-Y6o">
+                                        <rect key="frame" x="0.0" y="64" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lfS-sp-YVt">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </imageView>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <constraints>
+                                            <constraint firstItem="lfS-sp-YVt" firstAttribute="top" secondItem="mOn-xS-Y6o" secondAttribute="top" id="0up-rF-vdW"/>
+                                            <constraint firstAttribute="bottom" secondItem="lfS-sp-YVt" secondAttribute="bottom" id="SJG-XK-DMS"/>
+                                            <constraint firstAttribute="trailing" secondItem="lfS-sp-YVt" secondAttribute="trailing" id="aMq-sh-0PT"/>
+                                            <constraint firstItem="lfS-sp-YVt" firstAttribute="leading" secondItem="mOn-xS-Y6o" secondAttribute="leading" id="jEM-nY-byx"/>
+                                        </constraints>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Fi3-Uu-s88" firstAttribute="bottom" secondItem="bzf-5D-z7Z" secondAttribute="top" id="ABX-C0-gPq"/>
+                            <constraint firstItem="Fi3-Uu-s88" firstAttribute="top" secondItem="nLH-ke-py0" secondAttribute="bottom" id="KCb-ju-TKa"/>
+                            <constraint firstItem="Fi3-Uu-s88" firstAttribute="leading" secondItem="FC7-5J-7Mp" secondAttribute="leading" id="KD7-NU-r6n"/>
+                            <constraint firstAttribute="trailing" secondItem="Fi3-Uu-s88" secondAttribute="trailing" id="mVK-GY-XDI"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Burst Images" id="sxd-w6-M9Y"/>
+                    <connections>
+                        <outlet property="burstImagesCollection" destination="Fi3-Uu-s88" id="9Qk-Xx-yvh"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Sk9-lT-k5J" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1172" y="1108"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="ASI-wc-Des">

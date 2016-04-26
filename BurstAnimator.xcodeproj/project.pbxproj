@@ -13,6 +13,8 @@
 		743D39911CC7B36600B5756F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 743D398F1CC7B36600B5756F /* LaunchScreen.storyboard */; };
 		74FE5E6F1CCBD3B100D6BD76 /* BurstAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FE5E6E1CCBD3B100D6BD76 /* BurstAlbumVC.swift */; };
 		74FE5E771CCBDB7100D6BD76 /* BurstAlbumCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FE5E761CCBDB7100D6BD76 /* BurstAlbumCVC.swift */; };
+		74FE5E791CCF1B3F00D6BD76 /* BurstImageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FE5E781CCF1B3F00D6BD76 /* BurstImageVC.swift */; };
+		74FE5E7B1CCF1EC800D6BD76 /* BurstImageCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FE5E7A1CCF1EC800D6BD76 /* BurstImageCVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		743D39921CC7B36600B5756F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		74FE5E6E1CCBD3B100D6BD76 /* BurstAlbumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurstAlbumVC.swift; sourceTree = "<group>"; };
 		74FE5E761CCBDB7100D6BD76 /* BurstAlbumCVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurstAlbumCVC.swift; sourceTree = "<group>"; };
+		74FE5E781CCF1B3F00D6BD76 /* BurstImageVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurstImageVC.swift; sourceTree = "<group>"; };
+		74FE5E7A1CCF1EC800D6BD76 /* BurstImageCVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurstImageCVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				74FE5E761CCBDB7100D6BD76 /* BurstAlbumCVC.swift */,
+				74FE5E7A1CCF1EC800D6BD76 /* BurstImageCVC.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -79,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				74FE5E6E1CCBD3B100D6BD76 /* BurstAlbumVC.swift */,
+				74FE5E781CCF1B3F00D6BD76 /* BurstImageVC.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -155,6 +161,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				743D39871CC7B36600B5756F /* AppDelegate.swift in Sources */,
+				74FE5E7B1CCF1EC800D6BD76 /* BurstImageCVC.swift in Sources */,
+				74FE5E791CCF1B3F00D6BD76 /* BurstImageVC.swift in Sources */,
 				74FE5E6F1CCBD3B100D6BD76 /* BurstAlbumVC.swift in Sources */,
 				74FE5E771CCBDB7100D6BD76 /* BurstAlbumCVC.swift in Sources */,
 			);
