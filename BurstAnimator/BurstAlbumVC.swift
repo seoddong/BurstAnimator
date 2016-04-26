@@ -43,7 +43,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         options.includeAllBurstAssets = true
         
         // subtype이 SmartAlbumUserLibrary이면 카메라롤을 의미한다. SmartAlbumBursts이 Burst앨범을 의미한다.
-        burstAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .SmartAlbumUserLibrary, options: options)
+        burstAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .SmartAlbumBursts, options: options)
         //print("assetCollection.count = \(burstAlbum.count)")
         
         
@@ -128,12 +128,16 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     // 셀이 선택되었을 때를 설정하는 메소드
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         
+        // 셀이 선택되었음을 보여주기 위해서 셀의 모양에 변화를 주려 했으나 실제 셀이 선택되는 순간 뷰가 변경되므로 무의미한 코드가 되어버렸다.
         if let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as? BurstAlbumCVC {
         
             cell.layer.borderColor = UIColor.yellowColor().CGColor
             cell.layer.borderWidth = 5
             
         }
+        
+        // 셀이 선택될 때 BurstImageVC를 호출하기 위한 코드이다. 나중에 Burst Images를 불러오기 위하여 호출할 뷰에 burstIdentifier값을 넘겨주도록 하였다.
+        // BurstImageSegue는 Main.Storyboard에서 뷰와 뷰 사이의 연결고리에 설정한 identifier 값과 동일하게 설정한다.
         let burstIdentifier = burstImages[indexPath.item].burstIdentifier
         performSegueWithIdentifier("BurstImageSegue", sender: burstIdentifier)
     }
@@ -144,6 +148,9 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+        
+        // 위 performSegueWithIdentifier가 호출될 때 넘긴 burstIdentifier를 다음 뷰에 넘겨준다.
         if segue.identifier == "BurstImageSegue" {
             if let burstImageVC = segue.destinationViewController as? BurstImageVC {
                 if let burstIdentifier = sender as? String {
@@ -151,7 +158,6 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
                 }
             }
         }
-        // Pass the selected object to the new view controller.
     }
 
 

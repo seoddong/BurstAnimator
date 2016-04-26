@@ -93,7 +93,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell2" id="mOn-xS-Y6o">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell2" id="mOn-xS-Y6o" customClass="BurstImageCVC" customModule="BurstAnimator" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="64" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -112,6 +112,9 @@
                                             <constraint firstAttribute="trailing" secondItem="lfS-sp-YVt" secondAttribute="trailing" id="aMq-sh-0PT"/>
                                             <constraint firstItem="lfS-sp-YVt" firstAttribute="leading" secondItem="mOn-xS-Y6o" secondAttribute="leading" id="jEM-nY-byx"/>
                                         </constraints>
+                                        <connections>
+                                            <outlet property="imgView" destination="lfS-sp-YVt" id="kGF-yc-pcq"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
