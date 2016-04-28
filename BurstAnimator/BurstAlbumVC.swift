@@ -16,7 +16,6 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     @IBOutlet weak var burstAlbumCollectionView: UICollectionView!
     
     var burstImages, burstAlbum, burst: PHFetchResult!
-    var options = PHFetchOptions()
     let imageManager = PHCachingImageManager()
     
     var scale: CGFloat!
@@ -33,24 +32,22 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         burstAlbumCollectionView.delegate = self
         burstAlbumCollectionView.dataSource = self
         
-        // 화면의 가로 사이즈를 구한다.
-        // 화면이 landscape라면 세로 사이즈를 구한다.
+        // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale
-        // 화면의 좁은 쪽을 기준으로 3등분한다.
+        // 화면의 좁은 쪽을 기준으로 3등분한다. - 세워져있을 때는 가로를 기준으로 한다.
         targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / 3
-        //print("targetSizeX = \(targetSizeX)")
-        
-        options.includeAllBurstAssets = true
-        
+
         // subtype이 SmartAlbumUserLibrary이면 카메라롤을 의미한다. SmartAlbumBursts이 Burst앨범을 의미한다.
-        burstAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .SmartAlbumBursts, options: options)
-        //print("assetCollection.count = \(burstAlbum.count)")
+        burstAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .SmartAlbumBursts, options: nil)
+
+        // 사진을 역순으로 정렬하기 위한 fetch option 설정
+        let option = PHFetchOptions()
+        let sort1 = NSSortDescriptor(key: "creationDate", ascending: false)
+        option.sortDescriptors = [sort1]
         
-        
-        let collection = burstAlbum.firstObject as! PHAssetCollection //burstAlbum[0] as! PHAssetCollection
-        burstImages = PHAsset.fetchKeyAssetsInAssetCollection(collection, options: options)
-        //print("images.count = \(burstImages.count)")
-        
+        let collection = (burstAlbum.firstObject as! PHAssetCollection)
+        burstImages = PHAsset.fetchAssetsInAssetCollection(collection, options: option)
+        print("burstImages.count = \(burstImages.count)")
         
 
     }
@@ -111,12 +108,32 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     // 셀의 내용을 설정하는 메소드
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
+        let imageAsset: PHAsset = burstImages[indexPath.item] as! PHAsset
+        
         if let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as? BurstAlbumCVC {
             
-            cell.imageManager = imageManager
-            // print("Cell 내용 설정 - targetSizeX = \(targetSizeX)")
-            cell.targetSizeX = targetSizeX
-            cell.imageAsset = burstImages[indexPath.item] as? PHAsset
+            cell.representedAssetIdentifier = imageAsset.localIdentifier;
+            
+            // 이미지를 가져올 때 사용할 크기
+            let size: CGSize = CGSizeMake(cell.imgView.bounds.width * scale, cell.imgView.bounds.height * scale)
+            
+            // 이미지를 가져올 때 사용할 옵션
+            let option: PHImageRequestOptions = PHImageRequestOptions()
+            
+            // iCloud 이미지를 가져올 수도 있으므로 네트워크 사용을 허용한다.
+            option.networkAccessAllowed = true
+            
+            // 아래 메소드의 targetSize를 Cell의 크기나 imgView의 크기보다 더 크게 설정할 수 있다.
+            // 그렇게 해도 contentMode에 의해서 자동으로 imgView 크기에 맞추게 된다.
+            // AspectFill: 이미지 원본의 비율을 무시하고 무조건 imgView에 딱 맞춘다. 즉 이미지가 찌그러질 수 있다는 것.
+            // AspectFit: default 설정이다. 이미지 원본의 비율을 유지한채 imgView에 맞춘다고 하니 사실상 여백이 발생할 수 있다는 것.
+            self.imageManager.requestImageForAsset(imageAsset, targetSize: size, contentMode: .AspectFill, options: option, resultHandler: { (result, info) -> Void in
+                
+                // Set the cell's thumbnail image if it's still showing the same asset.
+                if (cell.representedAssetIdentifier == imageAsset.localIdentifier) {
+                    cell.imgView.image = result
+                }
+            })
             
             return cell
         }
@@ -149,6 +166,8 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        
+        // 셀을 선택했을 때 이게 호출되므로 sender는 cell이다.
         
         // 위 performSegueWithIdentifier가 호출될 때 넘긴 burstIdentifier를 다음 뷰에 넘겨준다.
         if segue.identifier == "BurstImageSegue" {

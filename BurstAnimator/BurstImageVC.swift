@@ -32,8 +32,8 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
         // BurstImages는 정렬을 하지 않으면 제멋대로 들어있다.
         options = PHFetchOptions()
         options.includeAllBurstAssets = true
-        let sort = NSSortDescriptor(key: "creationDate", ascending: true)
-        options.sortDescriptors = [sort]
+        let sort1 = NSSortDescriptor(key: "creationDate", ascending: true)
+        options.sortDescriptors = [sort1]
         
         // burstIdentifier에 해당하는 Burst Images를 가져온다.
         burstImages = PHAsset.fetchAssetsWithBurstIdentifier(burstIdentifier!, options: options)

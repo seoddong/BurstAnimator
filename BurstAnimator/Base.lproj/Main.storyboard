@@ -49,6 +49,7 @@
                                         </constraints>
                                         <connections>
                                             <outlet property="imgView" destination="02I-et-Ac3" id="Cg7-o7-hD4"/>
+                                            <segue destination="OLN-C9-fBb" kind="show" identifier="BurstImageSegue" id="uGz-F7-9hC"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -65,7 +66,6 @@
                     <navigationItem key="navigationItem" title="Burst Album" id="JQD-oo-cLf"/>
                     <connections>
                         <outlet property="burstAlbumCollectionView" destination="eyL-mW-MBA" id="7TV-i2-yGv"/>
-                        <segue destination="OLN-C9-fBb" kind="show" identifier="BurstImageSegue" id="8C4-5S-2B9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
