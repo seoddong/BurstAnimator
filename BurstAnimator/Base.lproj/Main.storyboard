@@ -127,7 +127,13 @@
                             <constraint firstAttribute="trailing" secondItem="Fi3-Uu-s88" secondAttribute="trailing" id="mVK-GY-XDI"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Burst Images" id="sxd-w6-M9Y"/>
+                    <navigationItem key="navigationItem" title="Burst Images" id="sxd-w6-M9Y">
+                        <barButtonItem key="rightBarButtonItem" title="Animate!" id="E1k-nj-djn">
+                            <connections>
+                                <segue destination="JeI-yT-sEY" kind="show" identifier="animateSegue" id="7gh-b6-c6n"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="burstImagesCollection" destination="Fi3-Uu-s88" id="9Qk-Xx-yvh"/>
                     </connections>
@@ -135,6 +141,45 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sk9-lT-k5J" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1172" y="1108"/>
+        </scene>
+        <!--Animation-->
+        <scene sceneID="yve-x5-LTc">
+            <objects>
+                <viewController id="JeI-yT-sEY" customClass="AnimateVC" customModule="BurstAnimator" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="xCS-cB-nep"/>
+                        <viewControllerLayoutGuide type="bottom" id="pgS-x6-sH0"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="1sD-2F-C5P">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GUH-cp-MzQ">
+                                <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="leading" secondItem="1sD-2F-C5P" secondAttribute="leading" id="A8A-cS-mBh"/>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="top" secondItem="xCS-cB-nep" secondAttribute="bottom" id="ccq-e0-kvp"/>
+                            <constraint firstAttribute="trailing" secondItem="GUH-cp-MzQ" secondAttribute="trailing" id="dOc-fb-AJe"/>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="bottom" secondItem="pgS-x6-sH0" secondAttribute="top" id="mbp-l1-5d8"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Animation" id="6QH-05-Bht">
+                        <barButtonItem key="rightBarButtonItem" title="Stop" id="zk8-m0-3CP">
+                            <connections>
+                                <action selector="stopBtnPressed:" destination="JeI-yT-sEY" id="xs5-xH-N9D"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="animatedImageView" destination="GUH-cp-MzQ" id="mtH-SH-c50"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="k9U-Qy-4NJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1172" y="1831"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="ASI-wc-Des">

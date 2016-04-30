@@ -50,6 +50,8 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+        _ = UIAlertController.init(title: "MemoryWarning", message: "\(self.nibName!) get didReceiveMemoryWarning()", preferredStyle: .Alert)
+        
     }
     
 
@@ -124,15 +126,16 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
 
-
-    /*
-    // MARK: - Navigation
-
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        
+        
+        if segue.identifier == "animateSegue" {
+            if let animateVC = segue.destinationViewController as? AnimateVC {
+                // AnimateVC로 BurstImages를 넘긴다.
+                animateVC.fetchresult = burstImages
+            }
+        }
     }
-    */
 
 }
