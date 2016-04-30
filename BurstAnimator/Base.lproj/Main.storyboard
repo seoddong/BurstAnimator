@@ -49,7 +49,7 @@
                                         </constraints>
                                         <connections>
                                             <outlet property="imgView" destination="02I-et-Ac3" id="Cg7-o7-hD4"/>
-                                            <segue destination="OLN-C9-fBb" kind="show" identifier="BurstImageSegue" id="uGz-F7-9hC"/>
+                                            <segue destination="OLN-C9-fBb" kind="show" identifier="BurstImageSegue" id="ymV-jP-68C"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>

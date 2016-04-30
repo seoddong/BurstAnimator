@@ -34,8 +34,8 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale
-        // 화면의 좁은 쪽을 기준으로 3등분한다. - 세워져있을 때는 가로를 기준으로 한다.
-        targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / 3
+        // 화면의 좁은 쪽을 기준으로 4등분한다. - 세워져있을 때는 가로를 기준으로 한다.
+        targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / 4
 
         // subtype이 SmartAlbumUserLibrary이면 카메라롤을 의미한다. SmartAlbumBursts이 Burst앨범을 의미한다.
         burstAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .SmartAlbumBursts, options: nil)
@@ -47,7 +47,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         let collection = (burstAlbum.firstObject as! PHAssetCollection)
         burstImages = PHAsset.fetchAssetsInAssetCollection(collection, options: option)
-        print("burstImages.count = \(burstImages.count)")
+        // print("burstImages.count = \(burstImages.count)")
         
 
     }
@@ -83,7 +83,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         // 이 크기를 감안해서 Cell의 크기를 설정해 주어야 한다.
         // 만약 Spacing을 고려하지 않고 Cell 크기를 설정하게 되어 미묘하게 Cell 크기가 가로 크기를 넘길 경우 이쁘지 않은 레이아웃을 보게 될 것이다.
         // 그러므로 최종 Cell의 크기는 Spacing 값을 참조하여 빼주도록 한다.
-        targetSizeX = burstAlbumCollectionView.frame.width / 3 - 1 // Min Spacing For Cell
+        targetSizeX = burstAlbumCollectionView.frame.width / 4 - 1 // Min Spacing For Cell
         // print("Cell 크기 설정 - targetSizeX = \(targetSizeX)")
         
         return CGSizeMake(targetSizeX, targetSizeX)
@@ -112,7 +112,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         
         if let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as? BurstAlbumCVC {
             
-            cell.representedAssetIdentifier = imageAsset.localIdentifier;
+            cell.representedAssetIdentifier = imageAsset.burstIdentifier;
             
             // 이미지를 가져올 때 사용할 크기
             let size: CGSize = CGSizeMake(cell.imgView.bounds.width * scale, cell.imgView.bounds.height * scale)
@@ -130,7 +130,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
             self.imageManager.requestImageForAsset(imageAsset, targetSize: size, contentMode: .AspectFill, options: option, resultHandler: { (result, info) -> Void in
                 
                 // Set the cell's thumbnail image if it's still showing the same asset.
-                if (cell.representedAssetIdentifier == imageAsset.localIdentifier) {
+                if (cell.representedAssetIdentifier == imageAsset.burstIdentifier) {
                     cell.imgView.image = result
                 }
             })
@@ -142,38 +142,17 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         }
     }
     
-    // 셀이 선택되었을 때를 설정하는 메소드
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        
-        // 셀이 선택되었음을 보여주기 위해서 셀의 모양에 변화를 주려 했으나 실제 셀이 선택되는 순간 뷰가 변경되므로 무의미한 코드가 되어버렸다.
-        if let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as? BurstAlbumCVC {
-        
-            cell.layer.borderColor = UIColor.yellowColor().CGColor
-            cell.layer.borderWidth = 5
-            
-        }
-        
-        // 셀이 선택될 때 BurstImageVC를 호출하기 위한 코드이다. 나중에 Burst Images를 불러오기 위하여 호출할 뷰에 burstIdentifier값을 넘겨주도록 하였다.
-        // BurstImageSegue는 Main.Storyboard에서 뷰와 뷰 사이의 연결고리에 설정한 identifier 값과 동일하게 설정한다.
-        let burstIdentifier = burstImages[indexPath.item].burstIdentifier
-        performSegueWithIdentifier("BurstImageSegue", sender: burstIdentifier)
-    }
     
-
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-        
-        // 셀을 선택했을 때 이게 호출되므로 sender는 cell이다.
-        
         // 위 performSegueWithIdentifier가 호출될 때 넘긴 burstIdentifier를 다음 뷰에 넘겨준다.
         if segue.identifier == "BurstImageSegue" {
             if let burstImageVC = segue.destinationViewController as? BurstImageVC {
-                if let burstIdentifier = sender as? String {
-                    burstImageVC.burstIdentifier = burstIdentifier
+                // 셀을 선택하면 sender는 cell 그 자체이다.
+                if let cell = sender as? BurstAlbumCVC {
+                    burstImageVC.burstIdentifier = cell.representedAssetIdentifier
                 }
             }
         }
