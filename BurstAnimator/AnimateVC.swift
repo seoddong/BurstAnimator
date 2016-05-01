@@ -33,7 +33,7 @@ class AnimateVC: UIViewController {
         // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale
         // 이미지를 가져올 때 사용할 크기
-        let size: CGSize = CGSizeMake(self.animatedImageView.bounds.width, self.animatedImageView.bounds.height)
+        let size: CGSize = CGSizeMake(self.animatedImageView.bounds.width * scale, self.animatedImageView.bounds.height * scale)
         print("scale = \(scale), size = \(size)")
         
         // 이미지를 가져올 때 사용할 옵션
@@ -41,7 +41,7 @@ class AnimateVC: UIViewController {
         // iCloud 이미지를 가져올 수도 있으므로 네트워크 사용을 허용한다.
         option.networkAccessAllowed = true
         option.deliveryMode = .HighQualityFormat
-        // option.synchronous = false로 하게 되면 사진을 다 가져오지 못 한 상태에서 다음 루프문이 실행되기 때문에 nil이 생기고 에러가 발생한다.
+        // option.synchronous = false로 하게 되면 사진을 다 가져오지 못 한 상태에서 다음 루프문이 실행되기 때문에 nil이 생기고 에러가 발생한다. 이 때에는 dispatch_async를 사용해야 하는데 해 보았는데 잘 안 되더라. 에러는 안 나는데 사진이 보이지 않는 문제가 있었다.
         option.synchronous = true
         
         // progress bar를 넣을 예정 - 각각의 이미지 로딩 진척률을 조합하여 계산 필요.
@@ -51,7 +51,7 @@ class AnimateVC: UIViewController {
         for ii in 0 ..< fetchresult.count {
             let imageasset = fetchresult[ii] as! PHAsset
             
-            // 도대체 왜 이미지가 찌그러지는지 알 수가 없다.
+            // 도대체 왜 이미지가 찌그러지는지 알 수가 없다. - 드디어 알아냈다. 너무 간단했다. Main.Storyboard의 animatedImageView 속성이 Scale to Fill로 되어 있었다. 어쩐지 이미지 뷰 크기에 딱 맞게 계속 채워지더라니..
             self.imagemanager.requestImageForAsset(imageasset, targetSize: size, contentMode: .AspectFit, options: option, resultHandler: { (result, info) -> Void in
                 self.animatedimagesarray.append(result!)
             })
