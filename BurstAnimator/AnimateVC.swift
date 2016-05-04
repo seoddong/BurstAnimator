@@ -12,9 +12,11 @@ import Photos
 class AnimateVC: UIViewController {
 
     @IBOutlet weak var animatedImageView: UIImageView!
+    @IBOutlet weak var labelCount: UILabel!
 
     var fetchresult: PHFetchResult!
     var scale: CGFloat!
+    var outputSize: CGSize!
     // 아래 변수를 optional로 선언을 했더니 animatedimagesarray.append() 할 때 unexpectedly found nil while unwrapping an Optional value 메시지가 계속 나온다.
     // 아래와 같이 optional 빼고 초기값 주었더니 오류는 안 난다.
     var animatedimagesarray: [UIImage] = []
@@ -23,18 +25,20 @@ class AnimateVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        self.view.setNeedsDisplay()
         
-        print("viewDidLoad")
     }
     
     override func viewWillAppear(animated: Bool) {
-        print("viewWillAppear")
+
         self.reloadInputViews()
+        
         // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale
         // 이미지를 가져올 때 사용할 크기
-        let size: CGSize = CGSizeMake(self.animatedImageView.bounds.width * scale, self.animatedImageView.bounds.height * scale)
-        print("scale = \(scale), size = \(size)")
+        outputSize = CGSizeMake(self.animatedImageView.bounds.width * scale, self.animatedImageView.bounds.height * scale)
+        print("scale = \(scale), size = \(outputSize)")
         
         // 이미지를 가져올 때 사용할 옵션
         let option: PHImageRequestOptions = PHImageRequestOptions()
@@ -45,6 +49,9 @@ class AnimateVC: UIViewController {
         option.synchronous = true
         
         // progress bar를 넣을 예정 - 각각의 이미지 로딩 진척률을 조합하여 계산 필요.
+        // 버튼의 숫자가 안 바뀐다.
+        labelCount.text = String(fetchresult.count)
+        //self.view.setNeedsDisplay()
         
         
         // fetchresult에는 burstImages가 들어있다.
@@ -52,9 +59,11 @@ class AnimateVC: UIViewController {
             let imageasset = fetchresult[ii] as! PHAsset
             
             // 도대체 왜 이미지가 찌그러지는지 알 수가 없다. - 드디어 알아냈다. 너무 간단했다. Main.Storyboard의 animatedImageView 속성이 Scale to Fill로 되어 있었다. 어쩐지 이미지 뷰 크기에 딱 맞게 계속 채워지더라니..
-            self.imagemanager.requestImageForAsset(imageasset, targetSize: size, contentMode: .AspectFit, options: option, resultHandler: { (result, info) -> Void in
+            self.imagemanager.requestImageForAsset(imageasset, targetSize: outputSize, contentMode: .AspectFit, options: option, resultHandler: { (result, info) -> Void in
                 self.animatedimagesarray.append(result!)
             })
+            labelCount.text = String(fetchresult.count - ii - 1)
+            //self.view.setNeedsDisplay()
             
         }
         
@@ -64,8 +73,7 @@ class AnimateVC: UIViewController {
         animatedImageView.animationRepeatCount = 0
         animatedImageView.startAnimating()
         
-        // 아래 코드가 필요할까 잘 모르겠다.
-        self.view.layoutIfNeeded()
+        //self.view.setNeedsDisplay()
     }
 
     override func didReceiveMemoryWarning() {
@@ -74,10 +82,12 @@ class AnimateVC: UIViewController {
         _ = UIAlertController.init(title: "MemoryWarning", message: "\(self.nibName!) get didReceiveMemoryWarning()", preferredStyle: .Alert)
     }
     
-    
-    @IBAction func stopBtnPressed(sender: AnyObject) {
-        animatedImageView.stopAnimating()
+    @IBAction func btnSavePressed(sender: AnyObject) {
+        let imagestovideo = ImagesToVideo()
+        imagestovideo.saveVideoFromImages(self.animatedimagesarray, outputSize: self.outputSize)
     }
+    
+
     
     /*
     // MARK: - Navigation
