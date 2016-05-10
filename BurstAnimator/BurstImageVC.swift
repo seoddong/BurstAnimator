@@ -111,8 +111,11 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
             // 그렇게 해도 contentMode에 의해서 자동으로 imgView 크기에 맞추게 된다.
             // AspectFill: 이미지 원본의 비율을 무시하고 무조건 imgView에 딱 맞춘다. 즉 이미지가 찌그러질 수 있다는 것.
             // AspectFit: default 설정이다. 이미지 원본의 비율을 유지한채 imgView에 맞춘다고 하니 사실상 여백이 발생할 수 있다는 것.
-            self.imageManager.requestImageForAsset(imageAsset, targetSize: size, contentMode: .AspectFill, options: option, resultHandler: { (result, info) -> Void in
+            // 이거 변경해도 사진이 찌그러질 경우 imgView의 설정을 AspectFit로 바꿔야 한다.
+            self.imageManager.requestImageForAsset(imageAsset, targetSize: size, contentMode: .AspectFit, options: option, resultHandler: { (result, info) -> Void in
                 
+                // option이 별도 설정을 안 해 주었으므로 비동기 방식인데, iCloud에서 사진을 가져오는 경우 고해상도의 사진을 가져올 때마다 이 부분이 계속 호출된다.
+                print("result1 = \(result)")
                 // Set the cell's thumbnail image if it's still showing the same asset.
                 if (cell.representedAssetIdentifier == imageAsset.localIdentifier) {
                     cell.imgView.image = result

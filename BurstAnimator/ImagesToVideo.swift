@@ -12,7 +12,7 @@ import UIKit
 
 class ImagesToVideo {
     
-    func saveVideoFromImages(arrayImages: NSArray, outputSize: CGSize) {
+    func saveVideoFromImages(arrayImages: NSArray, outputSize: CGSize) -> String {
         
         
         let tempPath = NSTemporaryDirectory().stringByAppendingString("temp.mp4")
@@ -56,7 +56,8 @@ class ImagesToVideo {
         var ii = 0
         var presentTime = CMTimeMake(Int64(ii), fps)
         print("presentTime = \(presentTime)")
-        while (true) {
+        var boolWhile = true
+        while1: while (boolWhile) {
             
             // 아래 autoreleasepool 찾는데 한 4일 걸렸다. 이 코드를 사용하지 않으면 memory usage가 계속 올라가서 500메가도 넘다가 결국 앱이 죽고 만다.
             autoreleasepool({() -> () in
@@ -70,12 +71,15 @@ class ImagesToVideo {
                         pixelBufferPointer = nil
                         
                         input.markAsFinished()
+                        videoWriter.endSessionAtSourceTime(presentTime)
                         videoWriter.finishWritingWithCompletionHandler({ () -> Void in
                             if videoWriter.status == AVAssetWriterStatus.Failed {
                                 print("oh noes, an error: \(videoWriter.error!.description)")
                             } else {
                                 print("hrmmm, there should be a movie?")
                                 UISaveVideoAtPathToSavedPhotosAlbum(tempPath, self, nil, nil);
+                                print("saved..")
+                                boolWhile = false
                             }
                         })
                         
@@ -91,7 +95,8 @@ class ImagesToVideo {
                         while (!input.readyForMoreMediaData) {
                             usleep(1);
                         }
-                        adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: CMTimeMake(Int64(ii), 30))
+                        
+                        adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: presentTime)
                         
                         ii += 1
                     }
@@ -102,7 +107,7 @@ class ImagesToVideo {
         
         
         
-        
+        return tempPath
         
     }
     
@@ -131,19 +136,22 @@ class ImagesToVideo {
         
         //let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
-        let status = CVPixelBufferCreate(kCFAllocatorDefault, Int(size.width), Int(size.height),
+        var status = CVPixelBufferCreate(kCFAllocatorDefault, Int(size.width), Int(size.height),
                                          kCVPixelFormatType_32ARGB, options, pxbuffer)
-        print("status = \(status)")
-        CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
-        let bufferData = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
+        
+        status = CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
+        
+        let bufferAddress = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
         
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-        let context = CGBitmapContextCreate(bufferData, Int(size.width),
+        let context = CGBitmapContextCreate(bufferAddress, Int(size.width),
                                             Int(size.height), 8, 4*Int(size.width), rgbColorSpace,
                                             CGImageAlphaInfo.NoneSkipFirst.rawValue);
+        print("image = \(image)")
         CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image);
         
-        CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
+        status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
+        
 
         //return pxbuffer
         
