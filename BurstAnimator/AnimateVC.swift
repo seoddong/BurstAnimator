@@ -28,14 +28,6 @@ class AnimateVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.setNeedsDisplay()
-        
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-
-        self.reloadInputViews()
-        
         // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale / 2 // 사진 크기를 작게 하려고 2로 나눔
         // 이미지를 가져올 때 사용할 크기
@@ -81,6 +73,13 @@ class AnimateVC: UIViewController {
         animatedImageView.startAnimating()
         
         //self.view.setNeedsDisplay()
+        
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+
+        // viewDidLoad에 들어갈 코드를 여기다가 넣었더니, 다음 view로 넘어갔다가 되돌아오면 코드가 다시 실행되어 보기 좋지 않았다.
+
     }
 
     override func didReceiveMemoryWarning() {

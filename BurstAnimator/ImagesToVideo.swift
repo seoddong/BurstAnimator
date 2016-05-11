@@ -18,20 +18,20 @@ class ImagesToVideo {
         let tempPath = NSTemporaryDirectory().stringByAppendingString("temp.mp4")
         do {
             try NSFileManager.defaultManager().removeItemAtPath(tempPath)
-            print("removeItemAtPath = success..")
+            debugPrint("removeItemAtPath = success..")
         }
         catch {
-            print("removeItemAtPath = error occured...")
+            debugPrint("removeItemAtPath = error occured...")
         }
         
         
         var videoWriter: AVAssetWriter!
         do {
             videoWriter = try AVAssetWriter(URL: NSURL(fileURLWithPath: tempPath), fileType: AVFileTypeMPEG4)
-            print("videoWriter = \(videoWriter)")
+            debugPrint("videoWriter = \(videoWriter)")
         }
         catch {
-            print("AVAssetWriter is failed..")
+            debugPrint("AVAssetWriter is failed..")
         }
         
         
@@ -58,8 +58,9 @@ class ImagesToVideo {
         // 초당 10프레임짜리 중 0번째 프레임을 의미함
         var presentTime = CMTimeMake(Int64(ii), fps)
         
-        print("presentTime = \(presentTime)")
+        debugPrint("presentTime = \(presentTime)")
         var boolWhile = true
+        var readyForMoreMediaDataFalseCount = 0
         while (boolWhile) {
             
             // 아래 autoreleasepool 찾는데 한 4일 걸렸다. 이 코드를 사용하지 않으면 memory usage가 계속 올라가서 500메가도 넘다가 결국 앱이 죽고 만다.
@@ -77,11 +78,11 @@ class ImagesToVideo {
                         videoWriter.endSessionAtSourceTime(presentTime)
                         videoWriter.finishWritingWithCompletionHandler({ () -> Void in
                             if videoWriter.status == AVAssetWriterStatus.Failed {
-                                print("oh noes, an error: \(videoWriter.error!.description)")
+                                debugPrint("oh noes, an error: \(videoWriter.error!.description)")
                             } else {
-                                print("hrmmm, there should be a movie?")
+                                debugPrint("hrmmm, there should be a movie?")
                                 UISaveVideoAtPathToSavedPhotosAlbum(tempPath, self, nil, nil);
-                                print("saved..")
+                                debugPrint("saved..")
                                 boolWhile = false
                             }
                         })
@@ -91,10 +92,11 @@ class ImagesToVideo {
 
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
                         self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize, pxbuffer: pixelBufferPointer)
+                        debugPrint("ii=\(ii)")
                         while (!input.readyForMoreMediaData) {
-                            usleep(1);
+                            // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 900번 가량으로 줄어든다.
+                            usleep(10);
                         }
-                        
                         adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: presentTime)
 
                         
@@ -102,11 +104,13 @@ class ImagesToVideo {
                     }
                     
                 }
+                else {
+                    readyForMoreMediaDataFalseCount += 1
+                    debugPrint("\(readyForMoreMediaDataFalseCount): readyForMoreMediaData is false at ii = \(ii)")
+                }
             })
         }
-        
-        
-        
+
         return tempPath
         
     }
@@ -147,7 +151,7 @@ class ImagesToVideo {
         let context = CGBitmapContextCreate(bufferAddress, Int(size.width),
                                             Int(size.height), 8, 4*Int(size.width), rgbColorSpace,
                                             CGImageAlphaInfo.NoneSkipFirst.rawValue);
-        print("image = \(image)")
+        debugPrint("image = \(image)")
         CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image);
         
         status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
