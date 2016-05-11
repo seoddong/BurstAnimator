@@ -54,10 +54,13 @@ class ImagesToVideo {
         let fps: Int32 = 10
         
         var ii = 0
+        
+        // 초당 10프레임짜리 중 0번째 프레임을 의미함
         var presentTime = CMTimeMake(Int64(ii), fps)
+        
         print("presentTime = \(presentTime)")
         var boolWhile = true
-        while1: while (boolWhile) {
+        while (boolWhile) {
             
             // 아래 autoreleasepool 찾는데 한 4일 걸렸다. 이 코드를 사용하지 않으면 memory usage가 계속 올라가서 500메가도 넘다가 결국 앱이 죽고 만다.
             autoreleasepool({() -> () in
@@ -85,11 +88,7 @@ class ImagesToVideo {
                         
                     }
                     else {
-                        /*
-                         // 아래와 같이 할 수도 있다고 한다.
-                         var buffer: CVPixelBuffer?
-                         &buffer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
-                         */
+
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
                         self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize, pxbuffer: pixelBufferPointer)
                         while (!input.readyForMoreMediaData) {
@@ -97,6 +96,7 @@ class ImagesToVideo {
                         }
                         
                         adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: presentTime)
+
                         
                         ii += 1
                     }
@@ -138,7 +138,7 @@ class ImagesToVideo {
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
         var status = CVPixelBufferCreate(kCFAllocatorDefault, Int(size.width), Int(size.height),
                                          kCVPixelFormatType_32ARGB, options, pxbuffer)
-        
+        debugPrint("status = \(status)")
         status = CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
         
         let bufferAddress = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
