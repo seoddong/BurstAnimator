@@ -90,7 +90,10 @@ class AnimateVC: UIViewController {
     }
     
     @IBAction func btnSavePressed(sender: AnyObject) {
-        let imagestovideo = ImagesToVideo()
+        self.animatedImageView.stopAnimating()
+        self.view.setNeedsDisplay()
+        
+        let imagestovideo = ImagesToVideo(sender: self)
         path = imagestovideo.saveVideoFromImages(self.animatedimagesarray, outputSize: self.outputSize)
     }
     

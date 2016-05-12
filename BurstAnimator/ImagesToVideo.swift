@@ -12,6 +12,12 @@ import UIKit
 
 class ImagesToVideo {
     
+    var sender: AnyObject
+    
+    init(sender: AnyObject) {
+        self.sender = sender
+    }
+    
     func saveVideoFromImages(arrayImages: NSArray, outputSize: CGSize) -> String {
         
         
@@ -91,8 +97,9 @@ class ImagesToVideo {
                     else {
 
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
-                        self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize, pxBuffer: pixelBufferPointer)
-                        debugPrint("ii=\(ii)")
+                        self.pixelBufferFromCGImage(arrayImages[ii] as! UIImage, size: outputSize, pxbuffer: pixelBufferPointer)
+                        
+                        //debugPrint("ii=\(ii)")
                         while (!input.readyForMoreMediaData) {
                             // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 1000번 가량으로 줄어든다.
                             usleep(10);
@@ -116,7 +123,11 @@ class ImagesToVideo {
     }
     
     //func pixelBufferFromCGImage(image: CGImage, size: CGSize) -> UnsafeMutablePointer<CVPixelBuffer?> {
-    func pixelBufferFromCGImage(image: CGImage, size: CGSize, pxBuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
+    func pixelBufferFromCGImage(image: UIImage, size: CGSize, pxbuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
+        
+        // UIImage를 쉽게 CGImage로 바꿀 수 없다는 것을 알았다. 아래의 과정을 거쳐야만 한다. 검은 화면이 나오는 것도 다 이런 이유였다.
+        let ciimage = CIImage(image: image)
+        let cgimage = convertCIImageToCGImage(ciimage!)
 
         // 아래 주석문의 Objective-C 구문을 swift로 변경하기 위해 이렇게 기나긴 코드를 작성해야 하다니!!
         // 오죽하면 아래 코드의 원작자도 stupid라는 주석을 달아놓았다!! ㅋㅋ
@@ -138,7 +149,7 @@ class ImagesToVideo {
 
         
         
-        let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
+        //let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
         var status = CVPixelBufferCreate(kCFAllocatorDefault, Int(size.width), Int(size.height),
                                          kCVPixelFormatType_32ARGB, options, pxbuffer)
@@ -152,16 +163,24 @@ class ImagesToVideo {
                                             Int(size.height), 8, 4*Int(size.width), rgbColorSpace,
                                             CGImageAlphaInfo.NoneSkipFirst.rawValue);
         //debugPrint("image = \(image)")
-        CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image);
+        CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(cgimage)), CGFloat(CGImageGetHeight(cgimage))), cgimage);
         
+        /*
         // context에 그림이 제대로 그려졌는지 이미지로 변경하여 확인
-        let contextImage = CGBitmapContextCreateImage(context)
-        let checkImage = UIImage.init(CGImage: contextImage!)
-        debugPrint("save..")
-        dispatch_async(dispatch_get_main_queue()) {
+        if let contextImage = CGBitmapContextCreateImage(context) {
+            let checkImage = UIImage.init(CGImage: contextImage)
+            let parentVC = sender as! AnimateVC
+            parentVC.animatedImageView.image = checkImage
+            //dispatch_async(dispatch_get_main_queue()) {
             // 이렇게 해도 카메라롤 가면 9장 저장 날렸는데 3~4장 밖에 저장이 안 된다.
-            UIImageWriteToSavedPhotosAlbum(checkImage, nil, nil, nil)
+//            UIImageWriteToSavedPhotosAlbum(checkImage, nil, nil, nil)
+//            debugPrint("save..")
+            //}
         }
+        else {
+            debugPrint("why context is null?")
+        }
+        */
         
         status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
         
@@ -170,7 +189,12 @@ class ImagesToVideo {
         
     }
     
-    
+    func convertCIImageToCGImage(inputImage: CIImage) -> CGImage! {
+        let context = CIContext(options: nil)
+        
+        return context.createCGImage(inputImage, fromRect: inputImage.extent)
+
+    }
     
     
     
