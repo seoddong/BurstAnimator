@@ -91,10 +91,10 @@ class ImagesToVideo {
                     else {
 
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
-                        self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize, pxbuffer: pixelBufferPointer)
+                        self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize, pxBuffer: pixelBufferPointer)
                         debugPrint("ii=\(ii)")
                         while (!input.readyForMoreMediaData) {
-                            // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 900번 가량으로 줄어든다.
+                            // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 1000번 가량으로 줄어든다.
                             usleep(10);
                         }
                         adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: presentTime)
@@ -106,7 +106,7 @@ class ImagesToVideo {
                 }
                 else {
                     readyForMoreMediaDataFalseCount += 1
-                    debugPrint("\(readyForMoreMediaDataFalseCount): readyForMoreMediaData is false at ii = \(ii)")
+                    //debugPrint("\(readyForMoreMediaDataFalseCount): readyForMoreMediaData is false at ii = \(ii)")
                 }
             })
         }
@@ -116,7 +116,7 @@ class ImagesToVideo {
     }
     
     //func pixelBufferFromCGImage(image: CGImage, size: CGSize) -> UnsafeMutablePointer<CVPixelBuffer?> {
-    func pixelBufferFromCGImage(image: CGImage, size: CGSize, pxbuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
+    func pixelBufferFromCGImage(image: CGImage, size: CGSize, pxBuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
 
         // 아래 주석문의 Objective-C 구문을 swift로 변경하기 위해 이렇게 기나긴 코드를 작성해야 하다니!!
         // 오죽하면 아래 코드의 원작자도 stupid라는 주석을 달아놓았다!! ㅋㅋ
@@ -138,7 +138,7 @@ class ImagesToVideo {
 
         
         
-        //let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
+        let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
         var status = CVPixelBufferCreate(kCFAllocatorDefault, Int(size.width), Int(size.height),
                                          kCVPixelFormatType_32ARGB, options, pxbuffer)
@@ -151,8 +151,17 @@ class ImagesToVideo {
         let context = CGBitmapContextCreate(bufferAddress, Int(size.width),
                                             Int(size.height), 8, 4*Int(size.width), rgbColorSpace,
                                             CGImageAlphaInfo.NoneSkipFirst.rawValue);
-        debugPrint("image = \(image)")
+        //debugPrint("image = \(image)")
         CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(image)), CGFloat(CGImageGetHeight(image))), image);
+        
+        // context에 그림이 제대로 그려졌는지 이미지로 변경하여 확인
+        let contextImage = CGBitmapContextCreateImage(context)
+        let checkImage = UIImage.init(CGImage: contextImage!)
+        debugPrint("save..")
+        dispatch_async(dispatch_get_main_queue()) {
+            // 이렇게 해도 카메라롤 가면 9장 저장 날렸는데 3~4장 밖에 저장이 안 된다.
+            UIImageWriteToSavedPhotosAlbum(checkImage, nil, nil, nil)
+        }
         
         status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
         
