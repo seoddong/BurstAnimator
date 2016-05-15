@@ -18,8 +18,21 @@ class ImagesToVideo {
         self.sender = sender
     }
     
-    func saveVideoFromImages(arrayImages: NSArray, outputSize: CGSize) -> String {
+    /**
+     *  Convenience methods for UIImage arry to video
+     *
+     *  param arrayImages   UIImages to convert to video
+     *  @param fps           FPS of video
+     */
+    func saveVideoFromUIImages(arrayImages: NSArray, fps: Int) -> String {
         
+        var outputSize: CGSize
+        
+        let image = arrayImages[0] as! UIImage
+        outputSize = CGSizeMake(image.size.width, image.size.height)
+        
+        debugPrint("arrayImages[0] = \(arrayImages[0])")
+        debugPrint("outputSize = \(outputSize)")
         
         let tempPath = NSTemporaryDirectory().stringByAppendingString("temp.mp4")
         do {
@@ -97,7 +110,7 @@ class ImagesToVideo {
                     else {
 
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
-                        self.pixelBufferFromCGImage(arrayImages[ii] as! UIImage, size: outputSize, pxbuffer: pixelBufferPointer)
+                        self.pixelBufferFromCGImage(arrayImages[ii] as! UIImage, pxbuffer: pixelBufferPointer)
                         
                         //debugPrint("ii=\(ii)")
                         while (!input.readyForMoreMediaData) {
@@ -123,7 +136,7 @@ class ImagesToVideo {
     }
     
     //func pixelBufferFromCGImage(image: CGImage, size: CGSize) -> UnsafeMutablePointer<CVPixelBuffer?> {
-    func pixelBufferFromCGImage(image: UIImage, size: CGSize, pxbuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
+    func pixelBufferFromCGImage(image: UIImage, pxbuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
         
         // UIImage를 쉽게 CGImage로 바꿀 수 없다는 것을 알았다. 아래의 과정을 거쳐야만 한다. 검은 화면이 나오는 것도 다 이런 이유였다.
         let ciimage = CIImage(image: image)
@@ -147,40 +160,49 @@ class ImagesToVideo {
         let options = CFDictionaryCreate(kCFAllocatorDefault, keysPointer, valuesPointer, keys.count, nil, nil)
         // 여기까지가 CFDictionary를 위한 코드
 
-        
+        let width = CGImageGetWidth(cgimage)
+        let height = CGImageGetHeight(cgimage)
         
         //let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
-        var status = CVPixelBufferCreate(kCFAllocatorDefault, Int(size.width), Int(size.height),
+        var status = CVPixelBufferCreate(kCFAllocatorDefault, width, height,
                                          kCVPixelFormatType_32ARGB, options, pxbuffer)
         debugPrint("status = \(status)")
         status = CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
         
         let bufferAddress = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
+        debugPrint("pxbuffer.memory = \(pxbuffer.memory)")
+
         
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-        let context = CGBitmapContextCreate(bufferAddress, Int(size.width),
-                                            Int(size.height), 8, 4*Int(size.width), rgbColorSpace,
+        let bytesperrow = CVPixelBufferGetBytesPerRow(pxbuffer.memory!)
+        let context = CGBitmapContextCreate(bufferAddress, width,
+                                            height, 8, bytesperrow, rgbColorSpace,
                                             CGImageAlphaInfo.NoneSkipFirst.rawValue);
         //debugPrint("image = \(image)")
-        CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(CGImageGetWidth(cgimage)), CGFloat(CGImageGetHeight(cgimage))), cgimage);
+        CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(width), CGFloat(height)), cgimage);
         
-        /*
+
         // context에 그림이 제대로 그려졌는지 이미지로 변경하여 확인
         if let contextImage = CGBitmapContextCreateImage(context) {
-            let checkImage = UIImage.init(CGImage: contextImage)
+            let checkImage1 = UIImage.init(CGImage: contextImage)
             let parentVC = sender as! AnimateVC
-            parentVC.animatedImageView.image = checkImage
+            //parentVC.animatedImageView.image = checkImage1
+            
+            let checkImage2 = CIImage.init(CVPixelBuffer: pxbuffer.memory!)
+            parentVC.animatedImageView.image = UIImage.init(CIImage: checkImage2)
+            
+            // 아래와 같이 비동기 방식을 이용하면 더 저장이 안 된다.
             //dispatch_async(dispatch_get_main_queue()) {
+            
             // 이렇게 해도 카메라롤 가면 9장 저장 날렸는데 3~4장 밖에 저장이 안 된다.
-//            UIImageWriteToSavedPhotosAlbum(checkImage, nil, nil, nil)
-//            debugPrint("save..")
-            //}
+            //UIImageWriteToSavedPhotosAlbum(checkImage, nil, nil, nil)
+            //debugPrint("save..")
         }
         else {
             debugPrint("why context is null?")
         }
-        */
+
         
         status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
         
@@ -195,9 +217,77 @@ class ImagesToVideo {
         return context.createCGImage(inputImage, fromRect: inputImage.extent)
 
     }
+
+    
+    /*
+    // 아래 메소드들은 디버그용이다. 출력창에 이미지를 대충 그리기 위함
+    func drawOutput(pixelbuffer: UnsafeMutablePointer<CVPixelBuffer?>, width: Int, height: Int) {
+        let pixels = pixelbuffer
+        for var ii in 0...height {
+            for var jj in 0...width {
+                let color = pixels.memory! as Int
+                print("\(r8(color)+g8(color)+b8(color)/3.0)")
+                pixels ++
+            }
+            print("\n");
+        }
+    }
+    func mask8(int: Int) -> Int {
+        return int & 0xFF
+    }
+    func r8(int: Int) -> Int {
+        return mask8(int)
+    }
+    func g8(int: Int) -> Int {
+        return mask8(int) >> 8
+    }
+    func b8(int: Int) -> Int {
+        return mask8(int) >> 16
+    }
+    */
     
     
     
-    
-    
+}
+
+
+// 나중에 쓸모가 있을 코드인 것 같다.
+extension CVPixelBufferRef {
+    /**
+     Iterates through each pixel in the receiver (assumed to be in ARGB format)
+     and overwrites the color component at the given index with a zero. This
+     has the effect of "cyanifying," "rosifying," etc (depending on the chosen
+     color component) the overall image represented by the pixel buffer.
+     */
+    func removeARGBColorComponentAtIndex(componentIndex: size_t) throws {
+        let lockBaseAddressResult = CVPixelBufferLockBaseAddress(self, 0)
+        
+        guard lockBaseAddressResult == kCVReturnSuccess else {
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(lockBaseAddressResult), userInfo: nil)
+        }
+        
+        let bufferHeight = CVPixelBufferGetHeight(self)
+        
+        let bufferWidth = CVPixelBufferGetWidth(self)
+        
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(self)
+        
+        let bytesPerPixel = bytesPerRow / bufferWidth
+        
+        let base = UnsafeMutablePointer<Int8>(CVPixelBufferGetBaseAddress(self))
+        
+        // For each pixel, zero out selected color component.
+        for row in 0..<bufferHeight {
+            for column in 0..<bufferWidth {
+                let pixel: UnsafeMutablePointer<Int8> = base + (row * bytesPerRow) + (column * bytesPerPixel)
+                pixel[componentIndex] = 0
+            }
+        }
+        
+        let unlockBaseAddressResult = CVPixelBufferUnlockBaseAddress(self, 0)
+        
+        guard unlockBaseAddressResult == kCVReturnSuccess else {
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(unlockBaseAddressResult), userInfo: nil)
+        }
+    }
 }

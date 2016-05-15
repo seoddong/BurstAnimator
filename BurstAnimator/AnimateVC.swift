@@ -66,6 +66,8 @@ class AnimateVC: UIViewController {
             
         }
         
+        
+        
         animatedImageView.animationImages = animatedimagesarray
         // animationDuration은 animation이 플레이될 총 시간(sec)을 의미한다. 그러므로 이미지 개수에 따라 총 시간을 다르게 설정해주어야 한다.
         animatedImageView.animationDuration = Double(fetchresult.count) * 0.1
@@ -94,7 +96,7 @@ class AnimateVC: UIViewController {
         self.view.setNeedsDisplay()
         
         let imagestovideo = ImagesToVideo(sender: self)
-        path = imagestovideo.saveVideoFromImages(self.animatedimagesarray, outputSize: self.outputSize)
+        path = imagestovideo.saveVideoFromImages(self.animatedimagesarray)
     }
     
 
