@@ -29,10 +29,10 @@ class AnimateVC: UIViewController {
         super.viewDidLoad()
 
         // scale은 레티나 여부를 판단하기 위함
-        scale = UIScreen.mainScreen().scale / 2 // 사진 크기를 작게 하려고 2로 나눔
+        scale = UIScreen.mainScreen().scale // 사진 크기를 작게 하려고 2로 나눔
         // 이미지를 가져올 때 사용할 크기
         outputSize = CGSizeMake(self.animatedImageView.bounds.width * scale, self.animatedImageView.bounds.height * scale)
-        print("scale = \(scale), size = \(outputSize)")
+        print("scale = \(scale), size(w,h) = (\(outputSize.width), \(outputSize.height))")
         
         // 이미지를 가져올 때 사용할 옵션
         let option: PHImageRequestOptions = PHImageRequestOptions()
@@ -58,7 +58,10 @@ class AnimateVC: UIViewController {
             
             // 도대체 왜 이미지가 찌그러지는지 알 수가 없다. - 드디어 알아냈다. 너무 간단했다. Main.Storyboard의 animatedImageView 속성이 Scale to Fill로 되어 있었다. 어쩐지 이미지 뷰 크기에 딱 맞게 계속 채워지더라니..
             self.imagemanager.requestImageForAsset(imageasset, targetSize: outputSize, contentMode: .AspectFit, options: option, resultHandler: { (result, info) -> Void in
-                print("result = \(result)")
+                //첫장과 마지막 장의 이미지 정보를 찍는다.
+                if (ii == 0 || ii == self.fetchresult.count - 1) {
+                    print("result[\(ii)] = \(result)")
+                }
                 self.animatedimagesarray.append(result!)
             })
             labelCount.text = String(fetchresult.count - ii - 1)
@@ -70,7 +73,7 @@ class AnimateVC: UIViewController {
         
         animatedImageView.animationImages = animatedimagesarray
         // animationDuration은 animation이 플레이될 총 시간(sec)을 의미한다. 그러므로 이미지 개수에 따라 총 시간을 다르게 설정해주어야 한다.
-        animatedImageView.animationDuration = Double(fetchresult.count) * 0.1
+        animatedImageView.animationDuration = Double(animatedimagesarray.count) * 0.1
         animatedImageView.animationRepeatCount = 0
         animatedImageView.startAnimating()
         
@@ -96,7 +99,7 @@ class AnimateVC: UIViewController {
         self.view.setNeedsDisplay()
         
         let imagestovideo = ImagesToVideo(sender: self)
-        path = imagestovideo.saveVideoFromImages(self.animatedimagesarray)
+        path = imagestovideo.saveVideoFromUIImages(self.animatedimagesarray, fps: 10)
     }
     
 

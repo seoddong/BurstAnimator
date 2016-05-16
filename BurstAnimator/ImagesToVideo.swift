@@ -89,6 +89,13 @@ class ImagesToVideo {
                     presentTime = CMTimeMake(Int64(ii), fps)
                     
                     if(ii >= arrayImages.count){
+                        
+                        // 비디오 변환 후 마지막 이미지의 pxbuffer만 이미지뷰에 표시한다.
+                        let parentVC = sender as! AnimateVC
+                        let checkImage = CIImage.init(CVPixelBuffer: pixelBufferPointer.memory!)
+                        parentVC.animatedImageView.image = UIImage.init(CIImage: checkImage)
+                        
+                        
                         pixelBufferPointer.dealloc(1)
                         //pixelBufferPointer.destroy()
                         pixelBufferPointer = nil
@@ -112,7 +119,7 @@ class ImagesToVideo {
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
                         self.pixelBufferFromCGImage(arrayImages[ii] as! UIImage, pxbuffer: pixelBufferPointer)
                         
-                        //debugPrint("ii=\(ii)")
+                        debugPrint("ii=\(ii)")
                         while (!input.readyForMoreMediaData) {
                             // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 1000번 가량으로 줄어든다.
                             usleep(10);
@@ -167,11 +174,17 @@ class ImagesToVideo {
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
         var status = CVPixelBufferCreate(kCFAllocatorDefault, width, height,
                                          kCVPixelFormatType_32ARGB, options, pxbuffer)
-        debugPrint("status = \(status)")
+        if (status != 0){
+            debugPrint("CVPixelBufferCreate status = \(status)")
+        }
+        
         status = CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
+        if (status != 0){
+            debugPrint("CVPixelBufferLockBaseAddress status = \(status)")
+        }
         
         let bufferAddress = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
-        debugPrint("pxbuffer.memory = \(pxbuffer.memory)")
+        //debugPrint("pxbuffer.memory = \(pxbuffer.memory)")
 
         
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB();
@@ -181,34 +194,11 @@ class ImagesToVideo {
                                             CGImageAlphaInfo.NoneSkipFirst.rawValue);
         //debugPrint("image = \(image)")
         CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(width), CGFloat(height)), cgimage);
-        
 
-        // context에 그림이 제대로 그려졌는지 이미지로 변경하여 확인
-        if let contextImage = CGBitmapContextCreateImage(context) {
-            let checkImage1 = UIImage.init(CGImage: contextImage)
-            let parentVC = sender as! AnimateVC
-            //parentVC.animatedImageView.image = checkImage1
-            
-            let checkImage2 = CIImage.init(CVPixelBuffer: pxbuffer.memory!)
-            parentVC.animatedImageView.image = UIImage.init(CIImage: checkImage2)
-            
-            // 아래와 같이 비동기 방식을 이용하면 더 저장이 안 된다.
-            //dispatch_async(dispatch_get_main_queue()) {
-            
-            // 이렇게 해도 카메라롤 가면 9장 저장 날렸는데 3~4장 밖에 저장이 안 된다.
-            //UIImageWriteToSavedPhotosAlbum(checkImage, nil, nil, nil)
-            //debugPrint("save..")
-        }
-        else {
-            debugPrint("why context is null?")
-        }
-
-        
         status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
-        
-
-        //return pxbuffer
-        
+        if (status != 0){
+            debugPrint("CVPixelBufferUnlockBaseAddress status = \(status)")
+        }
     }
     
     func convertCIImageToCGImage(inputImage: CIImage) -> CGImage! {

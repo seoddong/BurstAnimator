@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="m8H-YI-pv4">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="m8H-YI-pv4">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -178,15 +178,15 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="top" secondItem="DQ2-WR-aR1" secondAttribute="bottom" id="1Vj-rY-AkE"/>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="bottom" secondItem="pgS-x6-sH0" secondAttribute="top" id="0cd-VE-Cg6"/>
+                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="trailing" secondItem="nG1-kM-swO" secondAttribute="trailing" id="3TX-9N-ntr"/>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="trailing" secondItem="nG1-kM-swO" secondAttribute="trailing" id="3eA-vl-Ymd"/>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="top" secondItem="DQ2-WR-aR1" secondAttribute="bottom" id="5Ls-d6-ohK"/>
+                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="leading" secondItem="DQ2-WR-aR1" secondAttribute="leading" id="7VJ-pQ-b9P"/>
                             <constraint firstAttribute="trailing" secondItem="nG1-kM-swO" secondAttribute="trailing" id="7cB-PC-bip"/>
-                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="top" secondItem="nG1-kM-swO" secondAttribute="top" id="9kJ-Zq-EnS"/>
-                            <constraint firstItem="nG1-kM-swO" firstAttribute="trailing" secondItem="DQ2-WR-aR1" secondAttribute="trailing" id="DAo-rD-o1S"/>
-                            <constraint firstItem="nG1-kM-swO" firstAttribute="trailing" secondItem="GUH-cp-MzQ" secondAttribute="trailing" id="TY8-ic-ccB"/>
-                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="leading" secondItem="1sD-2F-C5P" secondAttribute="leading" id="ccW-pz-LSj"/>
-                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="leading" secondItem="GUH-cp-MzQ" secondAttribute="leading" id="eLa-71-fmB"/>
-                            <constraint firstItem="GUH-cp-MzQ" firstAttribute="bottom" secondItem="pgS-x6-sH0" secondAttribute="top" id="iWm-P3-q4m"/>
-                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="top" secondItem="xCS-cB-nep" secondAttribute="bottom" id="zG5-CZ-Wlm"/>
+                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="top" secondItem="xCS-cB-nep" secondAttribute="bottom" id="epS-pN-NG6"/>
+                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="leading" secondItem="1sD-2F-C5P" secondAttribute="leading" id="fgK-nm-3oe"/>
+                            <constraint firstItem="DQ2-WR-aR1" firstAttribute="top" secondItem="nG1-kM-swO" secondAttribute="top" id="jcO-KH-Gzx"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Animation" id="6QH-05-Bht">
