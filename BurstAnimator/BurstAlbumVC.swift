@@ -17,6 +17,8 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
     
     var burstImages, burstAlbum, burst: PHFetchResult!
     let imageManager = PHCachingImageManager()
+    let cellPerRow: CGFloat = 4
+    
     
     var scale: CGFloat!
     var targetSizeX: CGFloat!
@@ -35,7 +37,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale
         // 화면의 좁은 쪽을 기준으로 4등분한다. - 세워져있을 때는 가로를 기준으로 한다.
-        targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / 4
+        targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / cellPerRow
 
         // subtype이 SmartAlbumUserLibrary이면 카메라롤을 의미한다. SmartAlbumBursts이 Burst앨범을 의미한다.
         burstAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .SmartAlbumBursts, options: nil)
@@ -83,7 +85,7 @@ class BurstAlbumVC: UIViewController, UICollectionViewDelegate, UICollectionView
         // 이 크기를 감안해서 Cell의 크기를 설정해 주어야 한다.
         // 만약 Spacing을 고려하지 않고 Cell 크기를 설정하게 되어 미묘하게 Cell 크기가 가로 크기를 넘길 경우 이쁘지 않은 레이아웃을 보게 될 것이다.
         // 그러므로 최종 Cell의 크기는 Spacing 값을 참조하여 빼주도록 한다.
-        targetSizeX = burstAlbumCollectionView.frame.width / 4 - 1 // Min Spacing For Cell
+        targetSizeX = burstAlbumCollectionView.frame.width / cellPerRow - 1 // Min Spacing For Cell
         // print("Cell 크기 설정 - targetSizeX = \(targetSizeX)")
         
         return CGSizeMake(targetSizeX, targetSizeX)

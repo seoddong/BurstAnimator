@@ -22,6 +22,8 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
     var scale: CGFloat!
     
     let imageManager = PHCachingImageManager()
+    let cellPerRow: CGFloat = 4
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +35,7 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
         // scale은 레티나 여부를 판단하기 위함
         scale = UIScreen.mainScreen().scale
         // 화면의 좁은 쪽을 기준으로 3등분한다. - 세워져있을 때는 가로를 기준으로 한다.
-        targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / 3
+        targetSizeX = CGRectGetWidth(UIScreen.mainScreen().bounds) * scale / cellPerRow
         
         // BurstImages는 정렬을 하지 않으면 제멋대로 들어있다.
         option = PHFetchOptions()
@@ -71,7 +73,7 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
     // 3. 셀 크기
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         
-        targetSizeX = burstImagesCollection.frame.width / 3 - 1 // Min Spacing For Cell
+        targetSizeX = burstImagesCollection.frame.width / cellPerRow - 1 // Min Spacing For Cell
         // print("Cell 크기 설정 - targetSizeX = \(targetSizeX)")
         
         return CGSizeMake(targetSizeX, targetSizeX)

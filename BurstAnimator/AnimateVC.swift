@@ -99,7 +99,9 @@ class AnimateVC: UIViewController {
         self.view.setNeedsDisplay()
         
         let imagestovideo = ImagesToVideo(sender: self)
+
         path = imagestovideo.saveVideoFromUIImages(self.animatedimagesarray, fps: 10)
+
     }
     
 

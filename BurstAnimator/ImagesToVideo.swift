@@ -115,17 +115,18 @@ class ImagesToVideo {
                         
                     }
                     else {
+                        
+                        debugPrint("ii=\(ii)")
 
                         //pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! CGImage, size: outputSize)
                         self.pixelBufferFromCGImage(arrayImages[ii] as! UIImage, pxbuffer: pixelBufferPointer)
                         
-                        debugPrint("ii=\(ii)")
+                        
                         while (!input.readyForMoreMediaData) {
                             // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 1000번 가량으로 줄어든다.
                             usleep(10);
                         }
                         adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: presentTime)
-
                         
                         ii += 1
                     }
