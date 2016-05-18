@@ -26,6 +26,7 @@ class ImagesToVideo {
      */
     func saveVideoFromUIImages(arrayImages: NSArray, fps: Int) -> String {
         
+        
         var outputSize: CGSize
         
         let image = arrayImages[0] as! UIImage
@@ -34,16 +35,18 @@ class ImagesToVideo {
         debugPrint("arrayImages[0] = \(arrayImages[0])")
         debugPrint("outputSize = \(outputSize)")
         
+        let fileManager = NSFileManager()
         let tempPath = NSTemporaryDirectory().stringByAppendingString("temp.mp4")
-        do {
-            try NSFileManager.defaultManager().removeItemAtPath(tempPath)
-            debugPrint("removeItemAtPath = success..")
+        if (fileManager.fileExistsAtPath(tempPath)){
+            do {
+                try NSFileManager.defaultManager().removeItemAtPath(tempPath)
+                debugPrint("removeItemAtPath = success..")
+            }
+            catch {
+                debugPrint("removeItemAtPath = error occured...")
+            }
         }
-        catch {
-            debugPrint("removeItemAtPath = error occured...")
-        }
-        
-        
+
         var videoWriter: AVAssetWriter!
         do {
             videoWriter = try AVAssetWriter(URL: NSURL(fileURLWithPath: tempPath), fileType: AVFileTypeMPEG4)
@@ -63,8 +66,17 @@ class ImagesToVideo {
         let input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: videoSettings)
         let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: nil)
         videoWriter.addInput(input)
+        
         videoWriter.startWriting()
         videoWriter.startSessionAtSourceTime(kCMTimeZero)
+        
+        let writingGroup = dispatch_group_create()
+        // Handle completion.
+        let queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+        
+        dispatch_group_notify(writingGroup, queue) {
+
+        }
         
         var pixelBufferPointer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
         CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, pixelBufferPointer)
@@ -142,6 +154,7 @@ class ImagesToVideo {
         return tempPath
         
     }
+
     
     //func pixelBufferFromCGImage(image: CGImage, size: CGSize) -> UnsafeMutablePointer<CVPixelBuffer?> {
     func pixelBufferFromCGImage(image: UIImage, pxbuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
@@ -208,6 +221,9 @@ class ImagesToVideo {
         return context.createCGImage(inputImage, fromRect: inputImage.extent)
 
     }
+    
+
+
 
     
     /*

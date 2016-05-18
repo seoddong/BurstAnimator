@@ -24,6 +24,8 @@ class AnimateVC: UIViewController {
     var path: String!
     
     let imagemanager = PHCachingImageManager()
+    // 이미지를 가져올 때 사용할 옵션
+    let option: PHImageRequestOptions = PHImageRequestOptions()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,8 +36,7 @@ class AnimateVC: UIViewController {
         outputSize = CGSizeMake(self.animatedImageView.bounds.width * scale, self.animatedImageView.bounds.height * scale)
         print("scale = \(scale), size(w,h) = (\(outputSize.width), \(outputSize.height))")
         
-        // 이미지를 가져올 때 사용할 옵션
-        let option: PHImageRequestOptions = PHImageRequestOptions()
+
         // iCloud 이미지를 가져올 수도 있으므로 네트워크 사용을 허용한다.
         // 만약 이게 false이고 사진이 iCloud에 저장된 경우라면 HighQualityFormat으로 가져올 수 없는 상황이므로 오류가 발생하게 된다.
         option.networkAccessAllowed = true
@@ -96,10 +97,28 @@ class AnimateVC: UIViewController {
     
     @IBAction func btnSavePressed(sender: AnyObject) {
         self.animatedImageView.stopAnimating()
-        self.view.setNeedsDisplay()
+        //self.view.setNeedsDisplay()
+        
+        option.resizeMode = .None
+        self.animatedimagesarray.removeAll()
+        // fetchresult에는 burstImages가 들어있다.
+        for ii in 0 ..< fetchresult.count {
+            let imageasset = fetchresult[ii] as! PHAsset
+            
+            // 도대체 왜 이미지가 찌그러지는지 알 수가 없다. - 드디어 알아냈다. 너무 간단했다. Main.Storyboard의 animatedImageView 속성이 Scale to Fill로 되어 있었다. 어쩐지 이미지 뷰 크기에 딱 맞게 계속 채워지더라니..
+            self.imagemanager.requestImageForAsset(imageasset, targetSize: outputSize, contentMode: .AspectFit, options: option, resultHandler: { (result, info) -> Void in
+                //첫장과 마지막 장의 이미지 정보를 찍는다.
+                if (ii == 0 || ii == self.fetchresult.count - 1) {
+                    print("result[\(ii)] = \(result)")
+                }
+                self.animatedimagesarray.append(result!)
+            })
+            labelCount.text = String(fetchresult.count - ii - 1)
+            //self.view.setNeedsDisplay()
+            
+        }
         
         let imagestovideo = ImagesToVideo(sender: self)
-
         path = imagestovideo.saveVideoFromUIImages(self.animatedimagesarray, fps: 10)
 
     }
