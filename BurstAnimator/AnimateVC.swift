@@ -91,7 +91,7 @@ class AnimateVC: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-        _ = UIAlertController.init(title: "MemoryWarning", message: "get didReceiveMemoryWarning()", preferredStyle: .Alert)
+        debugPrint("AnimateVC.didReceiveMemoryWarning")
         
     }
     

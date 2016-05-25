@@ -52,7 +52,7 @@ class BurstImageVC: UIViewController, UICollectionViewDelegate, UICollectionView
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-        _ = UIAlertController.init(title: "MemoryWarning", message: "\(self.nibName!) get didReceiveMemoryWarning()", preferredStyle: .Alert)
+        debugPrint("BurstImageVC.didReceiveMemoryWarning")
         
     }
     
