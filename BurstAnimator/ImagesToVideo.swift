@@ -28,7 +28,7 @@ class ImagesToVideo {
      */
     func saveVideoFromUIImages(arrayImages: NSArray, fps: Int) -> String {
         
-        let framePerFile = arrayImages.count
+        let framePerFile = 3 //arrayImages.count
         let processCount = Int(ceil(Double(arrayImages.count) / Double(framePerFile)))
         debugPrint("processCount=\(processCount)")
         var arrayTempPath: [String] = []
@@ -36,7 +36,15 @@ class ImagesToVideo {
             arrayTempPath.append("temp_\(kk).mp4")
             var tempArrayImages: [UIImage] = []
             for ll in 0..<framePerFile {
-                tempArrayImages.append(arrayImages[kk*framePerFile + ll] as! UIImage)
+                let current = kk * framePerFile + ll
+                if (current >= arrayImages.count) {
+                    debugPrint("current = \(current)")
+                    break
+                }
+                else {
+                    
+                    tempArrayImages.append(arrayImages[kk*framePerFile + ll] as! UIImage)
+                }
                 
             }
             
@@ -93,8 +101,13 @@ class ImagesToVideo {
         let input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: videoSettings)
         
         // pixelBufferPool을 사용하기 위해서는 sourcePixelBufferAttributes가 nil이면 안된다고 함. (Pass nil if you do not need a pixel buffer pool for allocating buffers.)
-        let attr = getCFDictionary()
-        let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: attr as? [String: AnyObject])
+        let sourceBufferAttributes = [String : AnyObject](dictionaryLiteral:
+            (kCVPixelBufferPixelFormatTypeKey as String, Int(kCVPixelFormatType_32ARGB)),
+            (kCVPixelBufferWidthKey as String, Float(width)),
+            (kCVPixelBufferHeightKey as String, Float(height))
+        )
+        let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: sourceBufferAttributes)
+        debugPrint("adaptor = \(adaptor)")
         videoWriter.addInput(input)
         
         videoWriter.startWriting()
@@ -109,10 +122,10 @@ class ImagesToVideo {
 //        }
         
         var pixelBufferPointer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
-        let options = getCFDictionary()
+        let options = getCFDictionary(nil, imageHight: nil, bytesPerRow: nil)
         CVPixelBufferCreate(kCFAllocatorDefault, width, height,
                                          kCVPixelFormatType_32ARGB, options, pixelBufferPointer)
-        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, pixelBufferPointer)
+        //CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, pixelBufferPointer)
         
         //let assetWriterQueue = dispatch_queue_create("AssetWriterQueue", DISPATCH_QUEUE_SERIAL);
         
@@ -129,8 +142,11 @@ class ImagesToVideo {
             var boolWhile = true
             var readyForMoreMediaDataFalseCount = 0
             while (boolWhile) {
+                
+                var uiimage: UIImage?
+                
                 // dispatch_async를 추가하였더니 앱이 이유없이 죽는 문제는 사라졌다. 그러나 이제는 메모리 경고를 내뱉으며 메모리가 마구 올라가다가 죽고 만다.
-                dispatch_async(serialQueue) {
+                //dispatch_async(serialQueue) {
                     // 아래 autoreleasepool 찾는데 한 4일 걸렸다. 이 코드를 사용하지 않으면 memory usage가 계속 올라가서 500메가도 넘다가 결국 앱이 죽고 만다.
                     autoreleasepool({() -> () in
                         var boolReady = false
@@ -169,19 +185,27 @@ class ImagesToVideo {
                             }
                             else {
                                 
+                                uiimage = arrayImages[ii] as? UIImage
+                                
                                 // dispatch_async를 한 번 더 써주니 한 번 더 메모리 경고를 받게 되며 최종적으로 앱이 죽기 전에 "Message from debugger: Terminated due to memory issue"라는 메시지를 받을 수 있었다.
                                 dispatch_async(self.serialQueue) {
                                     debugPrint("before ii=\(ii)")
                                     
                                     // The current solution i am using is to separate the writing task to different segments, each segment writes a single file. At the end of the loop, i use AVMutableComposition to combine all small files. By this method, peak memory appears in each segment. Because each segment there are not many imgs to write, the memory will not be consumed too much. I appreciate other ideas
                                     // 아직까지 방법은 이와 같이 파일을 잘게 쪼개서 저장했다가 합치는 것 밖에 없는 것 같다.
-                                    pixelBufferPointer = self.pixelBufferFromCGImage(arrayImages[ii] as! UIImage)
+                                    let pixelBuffer = self.pixelBufferFromCGImage(uiimage!)
                                     
                                     // appendPixelBuffer에서 미친듯이 죽고 있다. 그 어떤 에러메시지 없이 죽어나자빠지는 것을 보니 스레드 실행에서 문제가 있는 것 같다. 다른 소스들은 @syncronized 같은 것을 사용하는데 어떤 것이 맞는 것인지 모르겠다.
-                                    adaptor.appendPixelBuffer(pixelBufferPointer.memory!, withPresentationTime: presentTime)
-                                    ii += 1
-                                    debugPrint("after ii=\(ii)")
+                                    let status = adaptor.appendPixelBuffer(pixelBuffer.memory!, withPresentationTime: presentTime)
+                                    if !status {
+                                        debugPrint("appendPixelBuffer is failed..")
+                                    }
+                                    pixelBuffer.destroy()
+                                    
                                 }
+                                
+                                ii += 1
+                                debugPrint("after ii=\(ii)")
                                 
 //                                while (!boolReady) {
 //                                    // 초당 10프레임짜리 3초 짜리 동영상 만드는데 여기 5000번 가량 들어온다. 10ms씩 재워주면 1000번 가량으로 줄어든다.
@@ -195,7 +219,7 @@ class ImagesToVideo {
                             //debugPrint("\(readyForMoreMediaDataFalseCount): readyForMoreMediaData is false at ii = \(ii)")
                         }
                     }) //autoreleasepool
-                } //dispatch_async(serialQueue)
+                //} //dispatch_async(serialQueue)
             }
         //}
         
@@ -204,13 +228,12 @@ class ImagesToVideo {
         
     }
     
-    func getCFDictionary() -> CFDictionary {
+    func getCFDictionary(imageWidth: Int?, imageHight: Int?, bytesPerRow: Int?) -> [String : AnyObject] {
         // 아래 주석문의 Objective-C 구문을 swift로 변경하기 위해 이렇게 기나긴 코드를 작성해야 하다니!!
         // 오죽하면 아래 코드의 원작자도 stupid라는 주석을 달아놓았다!! ㅋㅋ
         /*
          NSDictionary *options = @{(id)kCVPixelBufferCGImageCompatibilityKey: @YES,
          (id)kCVPixelBufferCGBitmapContextCompatibilityKey: @YES};
-         */
         // stupid CFDictionary stuff
         let keys: [CFStringRef] = [kCVPixelBufferCGImageCompatibilityKey, kCVPixelBufferCGBitmapContextCompatibilityKey]
         let values: [CFTypeRef] = [kCFBooleanTrue, kCFBooleanTrue]
@@ -218,55 +241,90 @@ class ImagesToVideo {
         let valuesPointer =  UnsafeMutablePointer<UnsafePointer<Void>>.alloc(1)
         keysPointer.initialize(keys)
         valuesPointer.initialize(values)
+
         //let options = CFDictionaryCreate(kCFAllocatorDefault, keysPointer, valuesPointer, keys.count, UnsafePointer<CFDictionaryKeyCallBacks>(), UnsafePointer<CFDictionaryValueCallBacks>())
         // 원래 위 코드였는데 swift3에서 변경되었다고 한다.
         let options = CFDictionaryCreate(kCFAllocatorDefault, keysPointer, valuesPointer, keys.count, nil, nil)
         
-        return options
+
+         */
+        
+        //var inputSettingsDict: [NSObject : AnyObject] = NSMutableDictionary() as [NSObject : AnyObject]
+        var inputSettingsDict: [String : AnyObject] = [:]
+        inputSettingsDict[String(kCVPixelBufferPixelFormatTypeKey)] = Int(kCVPixelFormatType_32ARGB)
+        if bytesPerRow != nil {
+            inputSettingsDict[String(kCVPixelBufferBytesPerRowAlignmentKey)] = bytesPerRow
+        }
+        if imageWidth != nil {
+            inputSettingsDict[String(kCVPixelBufferWidthKey)] = imageWidth
+        }
+        if imageHight != nil {
+            inputSettingsDict[String(kCVPixelBufferHeightKey)] = imageHight
+        }
+        inputSettingsDict[String(kCVPixelBufferCGImageCompatibilityKey)] = Int(true)
+        inputSettingsDict[String(kCVPixelBufferCGBitmapContextCompatibilityKey)] = Int(true)
+
+        return inputSettingsDict //options
+        
+        /*
+         NSMutableDictionary* inputSettingsDict = [NSMutableDictionary dictionary];
+         [inputSettingsDict setObject:[NSNumber numberWithInt:pixelFormat] forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
+         [inputSettingsDict setObject:[NSNumber numberWithUnsignedInteger:(NSUInteger)(image.uncompressedSize/image.rect.size.height)] forKey:(NSString*)kCVPixelBufferBytesPerRowAlignmentKey];
+         [inputSettingsDict setObject:[NSNumber numberWithDouble:image.rect.size.width] forKey:(NSString*)kCVPixelBufferWidthKey];
+         [inputSettingsDict setObject:[NSNumber numberWithDouble:image.rect.size.height] forKey:(NSString*)kCVPixelBufferHeightKey];
+         [inputSettingsDict setObject:[NSNumber numberWithBool:YES] forKey:(NSString*)kCVPixelBufferCGImageCompatibilityKey];
+         [inputSettingsDict setObject:[NSNumber numberWithBool:YES] forKey:(NSString*)kCVPixelBufferCGBitmapContextCompatibilityKey];
+
+         */
     }
 
     
     func pixelBufferFromCGImage(image: UIImage) -> UnsafeMutablePointer<CVPixelBuffer?> {
     //func pixelBufferFromCGImage(image: UIImage, pxbuffer: UnsafeMutablePointer<CVPixelBuffer?>) {
         
-        // UIImage를 쉽게 CGImage로 바꿀 수 없다는 것을 알았다. 아래의 과정을 거쳐야만 한다. 검은 화면이 나오는 것도 다 이런 이유였다.
-        let ciimage = CIImage(image: image)
-        let cgimage = convertCIImageToCGImage(ciimage!)
-        
-        let options = getCFDictionary()
-        
-        let width = CGImageGetWidth(cgimage)
-        let height = CGImageGetHeight(cgimage)
-        
         let pxbuffer = UnsafeMutablePointer<CVPixelBuffer?>.alloc(1)
         // pxbuffer = nil 할 경우 status = -6661 에러 발생한다.
-        var status = CVPixelBufferCreate(kCFAllocatorDefault, width, height,
-            kCVPixelFormatType_32ARGB, options, pxbuffer)
-        if (status != 0){
-            debugPrint("CVPixelBufferCreate status = \(status)")
-        }
         
-        status = CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
-        if (status != 0){
-            debugPrint("CVPixelBufferLockBaseAddress status = \(status)")
-        }
+        autoreleasepool({() -> () in
+            
+            // UIImage를 쉽게 CGImage로 바꿀 수 없다는 것을 알았다. 아래의 과정을 거쳐야만 한다. 검은 화면이 나오는 것도 다 이런 이유였다.
+            let ciimage = CIImage(image: image)
+            let cgimage = convertCIImageToCGImage(ciimage!)
+            let options = getCFDictionary(nil, imageHight: nil, bytesPerRow: nil)
+            
+            let width = CGImageGetWidth(cgimage)
+            let height = CGImageGetHeight(cgimage)
+            
+            var status = CVPixelBufferCreate(kCFAllocatorDefault, width, height,
+                kCVPixelFormatType_32ARGB, options, pxbuffer)
+            if (status != 0){
+                debugPrint("CVPixelBufferCreate status = \(status)")
+            }
+            
+            status = CVPixelBufferLockBaseAddress(pxbuffer.memory!, 0);
+            if (status != 0){
+                debugPrint("CVPixelBufferLockBaseAddress status = \(status)")
+            }
+            
+            let bufferAddress = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
+            //debugPrint("pxbuffer.memory = \(pxbuffer.memory)")
+            
+            
+            let rgbColorSpace = CGColorSpaceCreateDeviceRGB();
+            let bytesperrow = CVPixelBufferGetBytesPerRow(pxbuffer.memory!)
+            let context = CGBitmapContextCreate(bufferAddress, width,
+                height, 8, bytesperrow, rgbColorSpace,
+                CGImageAlphaInfo.NoneSkipFirst.rawValue);
+            //debugPrint("image = \(image)")
+            CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(width), CGFloat(height)), cgimage);
+            
+            status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
+            if (status != 0){
+                debugPrint("CVPixelBufferUnlockBaseAddress status = \(status)")
+            }
+            
+            })
         
-        let bufferAddress = CVPixelBufferGetBaseAddress(pxbuffer.memory!);
-        //debugPrint("pxbuffer.memory = \(pxbuffer.memory)")
-        
-        
-        let rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-        let bytesperrow = CVPixelBufferGetBytesPerRow(pxbuffer.memory!)
-        let context = CGBitmapContextCreate(bufferAddress, width,
-            height, 8, bytesperrow, rgbColorSpace,
-            CGImageAlphaInfo.NoneSkipFirst.rawValue);
-        //debugPrint("image = \(image)")
-        CGContextDrawImage(context, CGRectMake(0, 0, CGFloat(width), CGFloat(height)), cgimage);
-        
-        status = CVPixelBufferUnlockBaseAddress(pxbuffer.memory!, 0);
-        if (status != 0){
-            debugPrint("CVPixelBufferUnlockBaseAddress status = \(status)")
-        }
 
         return pxbuffer
     }
