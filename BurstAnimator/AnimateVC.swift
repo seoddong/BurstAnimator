@@ -99,6 +99,8 @@ class AnimateVC: UIViewController {
         self.animatedImageView.stopAnimating()
         //self.view.setNeedsDisplay()
         
+        
+        // 이미지 원본 사이즈로 동영상을 만들기 위해서 원본 이미지로 구성된 이미지 배열을 다시 만든다.
         option.resizeMode = .None
         self.animatedimagesarray.removeAll()
         // fetchresult에는 burstImages가 들어있다.
